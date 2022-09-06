@@ -87,7 +87,7 @@ class device_connection(threading.Thread):
                         c += 1
             #print(self.commands_output)
 
-            self.controller.setOutput(self.commands_output)
+            self.controller.setOutput(self.commands_output,self.ipaddress)
         except paramiko.AuthenticationException as ex:
             ex.with_traceback(tb)
             client.close()

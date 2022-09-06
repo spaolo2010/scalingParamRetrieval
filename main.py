@@ -8,12 +8,16 @@ import re
 class controller:
     def __init__ (self):
         self.output = {}
+        self.ipaddress =""
         all_nodes_connfig = []
     def retrieveDataFromNode(self):
         threaded_nodes = []
         # {'username'  :'admin','password' :'Cisco@123','IP' : '10.104.153.243'}
         # ['term length 0\n', 'show runn | i hostname\n', 'show runn\n', 'show vrf all\n', 'exit\n']
-        credentials = [{'username': 'svsbpanso', 'password': 'Pldt@321', 'IP': '10.104.153.23'}]
+        #credentials = [{'username': 'svsbpanso', 'password': 'Pldt@321', 'IP': '10.104.153.23'}]
+        credentials=[]
+        self.populateCredentials(credentials)
+
         # {'username'  :'admin','password' :'Cisco@123','IP' : '10.104.153.243'}]
         for credential in credentials:
             device = dev(credential['username'], credential['password'], credential['IP'],
@@ -26,18 +30,31 @@ class controller:
         if (self.output == {}):
 
             return None
-        return self.output
-    def setOutput(self,output):
+        return self.output , self.ipaddress
+    def setOutput(self,output,ipaddress):
+        self.ipaddress=ipaddress
         self.output = output
 
+    def populateCredentials(self, credentials):
+        with open('devices_list') as f:
+            entry = {}
+            lines = f.readlines()
+            #print (lines)
+            parts = lines[0].split(' ')
+            entry ['IP'] = parts[0]
+            entry['username'] = parts[1]
+            entry ['password'] = parts[2]
+            credentials.append(entry)
 
-def print_hi(name):
+
+
+def main():
 
     contr = controller()
     contr.retrieveDataFromNode()
     while (contr.getOutput() == None):
         pass
-    commands=contr.getOutput()
+    commands,ipaddress=contr.getOutput()
     global location
     location= None
     count =0
@@ -72,12 +89,12 @@ def print_hi(name):
         if (ele['count'] > max):
             max = ele['count']
             location = ele['location']
-    print (location +": "+ str(max))
+    print (ipaddress + " "+location +": "+ str(max))
 # Press the green button in the gutter to run the script.
 
 
 
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    main()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
